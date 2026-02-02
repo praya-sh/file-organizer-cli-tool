@@ -1,22 +1,19 @@
-use std::env;
-use std::path::Path;
 use std::fs;
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
+    let entries = fs::read_dir(".").expect("Failed to read directory");
 
-    if args.len() < 2{
-        println!("Usage: organizer <directory>")
+    for entry in entries {
+        let entry = entry.expect("Failed to read entry");
+        let path = entry.path();
+
+        if path.is_file(){
+            let name = path.file_name().unwrap().to_string_lossy();
+            let ext = path.extension().unwrap_or_default().to_string_lossy();
+
+            println!("{name} -> {ext}");
+
+            
+        }
     }
-
-    let dir_path = &args[1];
-    let path = Path::new(dir_path);
-
-    if !path.exists() || !path.is_dir(){
-        println!("{dir_path} is not a valid directory");
-        return;
-    }
-
-    println!("Organizing directory: {dir_path}");
-
 }

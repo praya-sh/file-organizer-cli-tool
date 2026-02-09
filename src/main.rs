@@ -1,5 +1,5 @@
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 fn category_for_extentions(ext: &str) ->&str{
     match ext {
@@ -24,12 +24,19 @@ fn main() {
             let ext = path.extension().unwrap_or_default().to_string_lossy().to_lowercase();
 
             let category = category_for_extentions(&ext);
-            let dir_path = Path::new(category);
+            let target_dir = Path::new(category);
 
-            if !dir_path.exists(){
-                fs::create_dir(dir_path).expect("failed to create directory");
+            if !target_dir.exists(){
+                fs::create_dir(target_dir).expect("failed to create directory");
                 println!("Created folder: {category}")
             }
+
+            let file_name = path.file_name().unwrap();
+            let mut new_path = PathBuf::from(target_dir);
+            new_path.push(file_name);
+
+            fs::rename(&path, &new_path).expect("failed to move file");
+            println!("Moved {:?} -> {:?}", path, new_path);
 
             println!("{name} -> {ext}, {category}");      
         }

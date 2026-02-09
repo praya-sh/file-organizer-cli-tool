@@ -1,4 +1,5 @@
 use std::fs;
+use std::path::Path;
 
 fn category_for_extentions(ext: &str) ->&str{
     match ext {
@@ -23,6 +24,12 @@ fn main() {
             let ext = path.extension().unwrap_or_default().to_string_lossy().to_lowercase();
 
             let category = category_for_extentions(&ext);
+            let dir_path = Path::new(category);
+
+            if !dir_path.exists(){
+                fs::create_dir(dir_path).expect("failed to create directory");
+                println!("Created folder: {category}")
+            }
 
             println!("{name} -> {ext}, {category}");      
         }

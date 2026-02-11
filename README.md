@@ -11,7 +11,7 @@ A fast, safe, and simple command-line tool written in Rust that organizes files 
 
 ```bash
 # Install
-cargo install tidy-file-organizer
+cargo install tidy-files
 
 # Run
 tidy ~/Downloads

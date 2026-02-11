@@ -1,17 +1,32 @@
-#  tidy
+# tidy
 
 A fast, safe, and simple command-line tool written in Rust that organizes files in a directory into categorized folders based on file extensions.
 
-##  Features
+[![Crates.io](https://img.shields.io/crates/v/tidy-file-organizer.svg)](https://crates.io/crates/tidy-file-organizer)
+[![Downloads](https://img.shields.io/crates/d/tidy-file-organizer.svg)](https://crates.io/crates/tidy-file-organizer)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=flat&logo=rust&logoColor=white)](https://www.rust-lang.org/)
 
--  **Organizes files by type** — Images, Docs, Videos, Audio, Archives, Others
--  **Fast** — Built with Rust standard library for optimal performance
--  **Dry-run mode** — Preview changes before applying them
--  **Safe by default** — Avoids overwriting files with smart renaming
--  **Cross-platform** — Works on Windows, macOS, and Linux
--  **Single binary** — No runtime dependencies required
+## Quick Start
 
-##  Example
+```bash
+# Install
+cargo install tidy-file-organizer
+
+# Run
+tidy ~/Downloads
+```
+
+## Features
+
+- **Organizes files by type** — Images, Docs, Videos, Audio, Archives, Others
+- **Fast** — Built with Rust standard library for optimal performance
+- **Dry-run mode** — Preview changes before applying them
+- **Safe by default** — Avoids overwriting files with smart renaming
+- **Cross-platform** — Works on Windows, macOS, and Linux
+- **Single binary** — No runtime dependencies required
+
+## 📦 Example
 
 **Before:**
 ```
@@ -37,10 +52,10 @@ Downloads/
 
 ## Installation
 
-### Option 1 — Install via Cargo (Recommended)
+### Install from crates.io (Recommended)
 
 ```bash
-cargo install --path .
+cargo install tidy-file-organizer
 ```
 
 Then use it anywhere:
@@ -49,8 +64,16 @@ tidy
 tidy ~/Downloads
 ```
 
-### Option 2 — Build Manually
+### Build from Source
 
+**Clone and install:**
+```bash
+git clone https://github.com/yourusername/tidy
+cd tidy
+cargo install --path .
+```
+
+**Or build manually:**
 ```bash
 cargo build --release
 ```
@@ -169,15 +192,19 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - [ ] Date-based organization option
 - [ ] File size-based organization
 
-## Author
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👤 Author
 
 **Prayash Shakya**
 
-Built with 🦀 Rust
+- 📦 [crates.io/crates/tidy-files](https://crates.io/crates/tidy-files)
+- 🦀 Built with Rust
 
 ---
 
 <div align="center">
   <sub>If you found this useful, consider giving it a ⭐!</sub>
 </div>
-

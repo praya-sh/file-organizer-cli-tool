@@ -1,6 +1,19 @@
 [package]
-name = "tidy"
+name = "tidy-files"
 version = "0.1.0"
 edition = "2024"
+authors = ["Prayash Shakya prayashshakya20@gmail.com"]
+description = "A fast, safe CLI tool to organize files into categorized folders"
+readme = "README.md"
+homepage = "https://github.com/praya-sh/file-organizer-cli-tool"
+repository = "https://github.com/praya-sh/file-organizer-cli-tool"
+license = "MIT"
+keywords = ["cli", "file-organizer", "filesystem", "utility", "productivity"]
+categories = ["command-line-utilities", "filesystem"]
 
 [dependencies]
+
+[[bin]]
+name = "tidy"
+path = "src/main.rs"
+

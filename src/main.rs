@@ -43,8 +43,11 @@ fn main() {
     let args: Vec<String> = env::args().collect();
     let dir = args.get(1).map(String::as_str).unwrap_or(".");
     let dry_run = args.iter().any(|arg| arg == "--dry-run");
+    let force = args.iter().any(|arg| arg == "--force");
 
     let entries = fs::read_dir(dir).expect("Failed to read directory");
+
+    let mut moved_count = 0;
 
     for entry in entries {
         let entry = entry.expect("Failed to read entry");
@@ -66,7 +69,10 @@ fn main() {
 
             let file_name = path.file_name().unwrap();
             let mut new_path = target_dir.join(file_name);
-            new_path = unique_path(new_path);
+            
+            if !force{
+                new_path = unique_path(new_path);
+            }
 
             if dry_run {
                 println!("[DRY RUN] {:?} -> {:?}", path, new_path);
@@ -75,6 +81,8 @@ fn main() {
 
             fs::rename(&path, &new_path).expect("Failed to move file");
             println!("Moved {:?} -> {:?}", path, new_path);
+            moved_count += 1;
         }
     }
+    println!("\nDone. {moved_count} files organized");
 }

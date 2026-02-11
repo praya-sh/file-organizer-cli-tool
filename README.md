@@ -2,8 +2,8 @@
 
 A fast, safe, and simple command-line tool written in Rust that organizes files in a directory into categorized folders based on file extensions.
 
-[![Crates.io](https://img.shields.io/crates/v/tidy-file-organizer.svg)](https://crates.io/crates/tidy-files/0.1.0)
-[![Downloads](https://img.shields.io/crates/d/tidy-file-organizer.svg)](https://crates.io/crates/tidy-files/0.1.0)
+[![Crates.io](https://img.shields.io/crates/v/tidy-file-organizer.svg)](https://crates.io/crates/tidy-files/)
+[![Downloads](https://img.shields.io/crates/d/tidy-file-organizer.svg)](https://crates.io/crates/tidy-files/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=flat&logo=rust&logoColor=white)](https://www.rust-lang.org/)
 
@@ -55,7 +55,7 @@ Downloads/
 ### Install from crates.io (Recommended)
 
 ```bash
-cargo install tidy-file-organizer
+cargo install tidy-files
 ```
 
 Then use it anywhere:
@@ -200,7 +200,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Prayash Shakya**
 
-- 📦 [crates.io/crates/tidy-files](https://crates.io/crates/tidy-files/0.1.0)
+- 📦 [crates.io/crates/tidy-files](https://crates.io/crates/tidy-files/)
 - 🦀 Built with Rust
 
 ---

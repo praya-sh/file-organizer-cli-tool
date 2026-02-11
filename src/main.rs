@@ -13,7 +13,7 @@ fn category_for_extension(ext: &str) -> &str {
     }
 }
 
-fn unique_path(mut path: PathBuf) -> PathBuf{
+fn unique_path(path: PathBuf) -> PathBuf{
     if !path.exists(){
         return path
     }

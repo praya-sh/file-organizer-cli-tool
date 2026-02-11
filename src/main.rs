@@ -4,11 +4,11 @@ use std::path::{Path, PathBuf};
 
 fn category_for_extension(ext: &str) -> &str {
     match ext {
-        "png" | "jpg" | "jpeg" | "gif" => "Images",
-        "pdf" | "doc" | "docx" | "txt" => "Docs",
-        "mp4" | "mkv" | "avi" => "Videos",
-        "mp3" | "wav" => "Audio",
-        "zip" | "rar" | "7z" => "Archives",
+        "png" | "jpg" | "jpeg" | "gif" | "bmp" | "svg" | "webp" => "Images",
+        "pdf" | "doc" | "docx" | "txt" | "rtf"| "otd" => "Docs",
+        "mp4" | "mkv" | "avi" | "mov" | "wmv" | "flv" => "Videos",
+        "mp3" | "wav" | "flac" | "aac" | "ogg"| "m4a" => "Audio",
+        "zip" | "rar" | "7z" | "tar" | "gz" | "bz2" => "Archives",
         _ => "Others",
     }
 }

@@ -40,9 +40,16 @@ fn unique_path(path: PathBuf) -> PathBuf {
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    let dir = args.get(1).map(String::as_str).unwrap_or(".");
     let dry_run = args.iter().any(|arg| arg == "--dry-run");
     let force = args.iter().any(|arg| arg == "--force");
+
+    // Get the first non-flag argument as the directory, or default to "."
+    let dir = args
+        .iter()
+        .skip(1)
+        .find(|arg| !arg.starts_with("--"))
+        .map(String::as_str)
+        .unwrap_or(".");
 
     let entries = fs::read_dir(dir).expect("Failed to read directory");
 
@@ -62,10 +69,6 @@ fn main() {
             let category = category_for_extension(&ext);
             let target_dir = Path::new(dir).join(category);
 
-            if !target_dir.exists() {
-                fs::create_dir(&target_dir).expect("Failed to create directory");
-            }
-
             let file_name = path.file_name().unwrap();
             let mut new_path = target_dir.join(file_name);
 
@@ -76,6 +79,10 @@ fn main() {
             if dry_run {
                 println!("[DRY RUN] {:?} -> {:?}", path, new_path);
                 continue;
+            }
+
+            if !target_dir.exists() {
+                fs::create_dir(&target_dir).expect("Failed to create directory");
             }
 
             fs::rename(&path, &new_path).expect("Failed to move file");

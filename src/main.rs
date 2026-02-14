@@ -1,49 +1,18 @@
+mod log;
+mod utils;
+
+use log::{OperationLog, log_file_name};
 use std::env;
 use std::fs;
-use std::path::{Path, PathBuf};
-
-fn category_for_extension(ext: &str) -> &str {
-    match ext {
-        "png" | "jpg" | "jpeg" | "gif" | "bmp" | "svg" | "webp" => "Images",
-        "pdf" | "doc" | "docx" | "txt" | "rtf" | "otd" => "Docs",
-        "mp4" | "mkv" | "avi" | "mov" | "wmv" | "flv" => "Videos",
-        "mp3" | "wav" | "flac" | "aac" | "ogg" | "m4a" => "Audio",
-        "zip" | "rar" | "7z" | "tar" | "gz" | "bz2" => "Archives",
-        _ => "Others",
-    }
-}
-
-fn unique_path(path: PathBuf) -> PathBuf {
-    if !path.exists() {
-        return path;
-    }
-
-    let stem = path.file_stem().unwrap().to_string_lossy();
-    let ext = path.extension().map(|e| e.to_string_lossy());
-    let parent = path.parent().unwrap();
-
-    for i in 1.. {
-        let mut new_name = format!("{}({})", stem, i);
-        if let Some(ext) = &ext {
-            new_name.push('.');
-            new_name.push_str(ext);
-        }
-
-        let candidate = parent.join(&new_name);
-        if !candidate.exists() {
-            return candidate;
-        }
-    }
-
-    unreachable!()
-}
+use std::path::Path;
+use utils::{category_for_extension, unique_path};
 
 fn main() {
     let args: Vec<String> = env::args().collect();
     let dry_run = args.iter().any(|arg| arg == "--dry-run");
     let force = args.iter().any(|arg| arg == "--force");
+    let revert = args.iter().any(|arg| arg == "--revert");
 
-    // Get the first non-flag argument as the directory, or default to "."
     let dir = args
         .iter()
         .skip(1)
@@ -51,44 +20,129 @@ fn main() {
         .map(String::as_str)
         .unwrap_or(".");
 
-    let entries = fs::read_dir(dir).expect("Failed to read directory");
+    if revert {
+        // Revert mode: reverse the operations from the log
+        let log = OperationLog::load(dir);
 
-    let mut moved_count = 0;
+        if log.operations.is_empty() {
+            println!("No operations to revert. Log is empty.");
+            return;
+        }
 
-    for entry in entries {
-        let entry = entry.expect("Failed to read entry");
-        let path = entry.path();
+        println!("Found {} operations to revert", log.operations.len());
+        let mut reverted_count = 0;
 
-        if path.is_file() {
-            let ext = path
-                .extension()
-                .unwrap_or_default()
-                .to_string_lossy()
-                .to_lowercase();
-
-            let category = category_for_extension(&ext);
-            let target_dir = Path::new(dir).join(category);
-
-            let file_name = path.file_name().unwrap();
-            let mut new_path = target_dir.join(file_name);
-
-            if !force {
-                new_path = unique_path(new_path);
-            }
+        // Reverse the operations in reverse order (LIFO)
+        for op in log.operations.iter().rev() {
+            let from_path = Path::new(&op.from);
+            let to_path = Path::new(&op.to);
 
             if dry_run {
-                println!("[DRY RUN] {:?} -> {:?}", path, new_path);
+                println!("[DRY RUN] Revert: {:?} <- {:?}", from_path, to_path);
                 continue;
             }
 
-            if !target_dir.exists() {
-                fs::create_dir(&target_dir).expect("Failed to create directory");
+            if !to_path.exists() {
+                println!("Warning: {:?} does not exist, skipping revert", to_path);
+                continue;
             }
 
-            fs::rename(&path, &new_path).expect("Failed to move file");
-            println!("Moved {:?} -> {:?}", path, new_path);
-            moved_count += 1;
+            if from_path.exists() {
+                println!("Warning: {:?} already exists, skipping revert", from_path);
+                continue;
+            }
+
+            if let Some(parent) = from_path.parent() {
+                if !parent.exists() {
+                    println!(
+                        "Warning: Parent directory {:?} does not exist, skipping",
+                        parent
+                    );
+                    continue;
+                }
+            }
+
+            match fs::rename(to_path, from_path) {
+                Ok(_) => {
+                    println!("Reverted: {:?} <- {:?}", from_path, to_path);
+                    reverted_count += 1;
+                }
+                Err(e) => {
+                    println!("Error reverting {:?}: {}", to_path, e);
+                }
+            }
         }
+
+        if dry_run {
+            println!(
+                "\n[DRY RUN] Would revert {} operations",
+                log.operations.len()
+            );
+        } else {
+            println!("\nDone. {} operations reverted", reverted_count);
+
+            if reverted_count > 0 {
+                let new_log = OperationLog::new();
+                new_log.save(dir);
+                println!("Log cleared.");
+            }
+        }
+    } else {
+        // Organize mode: categorize files and log operations
+        let mut log = OperationLog::load(dir);
+        let entries = fs::read_dir(dir).expect("Failed to read directory");
+
+        let mut moved_count = 0;
+
+        for entry in entries {
+            let entry = entry.expect("Failed to read entry");
+            let path = entry.path();
+
+            if path.file_name().and_then(|n| n.to_str()) == Some(log_file_name()) {
+                continue;
+            }
+
+            if path.is_file() {
+                let ext = path
+                    .extension()
+                    .unwrap_or_default()
+                    .to_string_lossy()
+                    .to_lowercase();
+
+                let category = category_for_extension(&ext);
+                let target_dir = Path::new(dir).join(category);
+
+                let file_name = path.file_name().unwrap();
+                let mut new_path = target_dir.join(file_name);
+
+                if !force {
+                    new_path = unique_path(new_path);
+                }
+
+                if dry_run {
+                    println!("[DRY RUN] {:?} -> {:?}", path, new_path);
+                    continue;
+                }
+
+                if !target_dir.exists() {
+                    fs::create_dir(&target_dir).expect("Failed to create directory");
+                }
+
+                log.add_operation(
+                    path.to_string_lossy().to_string(),
+                    new_path.to_string_lossy().to_string(),
+                );
+
+                fs::rename(&path, &new_path).expect("Failed to move file");
+                println!("Moved {:?} -> {:?}", path, new_path);
+                moved_count += 1;
+            }
+        }
+
+        if !dry_run && moved_count > 0 {
+            log.save(dir);
+        }
+
+        println!("\nDone. {} files organized", moved_count);
     }
-    println!("\nDone. {moved_count} files organized");
 }

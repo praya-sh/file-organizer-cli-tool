@@ -1,6 +1,6 @@
 [package]
 name = "tidy-files"
-version = "0.1.2"
+version = "0.2.0"
 edition = "2024"
 authors = ["Prayash Shakya prayashshakya20@gmail.com"]
 description = "A fast, safe CLI tool to organize files into categorized folders"

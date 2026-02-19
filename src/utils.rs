@@ -1,14 +1,14 @@
 use std::path::PathBuf;
 
-pub fn category_for_extension(ext: &str) -> &str {
-    match ext {
-        "png" | "jpg" | "jpeg" | "gif" | "bmp" | "svg" | "webp" => "Images",
-        "pdf" | "doc" | "docx" | "txt" | "rtf" | "otd" => "Docs",
-        "mp4" | "mkv" | "avi" | "mov" | "wmv" | "flv" => "Videos",
-        "mp3" | "wav" | "flac" | "aac" | "ogg" | "m4a" => "Audio",
-        "zip" | "rar" | "7z" | "tar" | "gz" | "bz2" => "Archives",
-        _ => "Others",
+use crate::config::Config;
+
+pub fn category_for_extension(ext: &str, config: &Config) -> String {
+    for (category, extensions) in &config.categories {
+        if extensions.iter().any(|e| e == ext) {
+            return category.clone();
+        }
     }
+    "Others".to_string()
 }
 
 pub fn unique_path(path: PathBuf) -> PathBuf {

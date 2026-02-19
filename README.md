@@ -20,6 +20,7 @@ tidy ~/Downloads
 ## Features
 
 - **Organizes files by type** — Images, Docs, Videos, Audio, Archives, Others
+- **Custom categories** — Define your own categories via a global config file
 - **Fast** — Built with Rust standard library for optimal performance
 - **Dry-run mode** — Preview changes before applying them
 - **Safe by default** — Avoids overwriting files with smart renaming
@@ -119,6 +120,8 @@ tidy ~/Downloads --force
 |------|-------------|
 | `--dry-run` | Show what would happen without moving files |
 | `--force` | Overwrite existing files instead of renaming |
+| `--revert` | Revert the changes made in the directory |
+| `--init-config` | Generate a default config file for customization |
 
 ## How It Works
 
@@ -138,6 +141,41 @@ tidy ~/Downloads --force
 | `mp3`, `wav`, `flac`, `aac`, `ogg`, `m4a` | `Audio` |
 | `zip`, `rar`, `7z`, `tar`, `gz`, `bz2` | `Archives` |
 | All others | `Others` |
+
+## Custom Configuration
+
+You can customize categories by creating a config file. The tool works out of the box with the default categories above — configuration is entirely optional.
+
+### Generate a config file
+
+```bash
+tidy --init-config
+```
+
+This creates a `config.toml` at your system's config directory:
+
+| OS | Path |
+|----|------|
+| Windows | `%APPDATA%\tidy\config.toml` |
+| Linux | `~/.config/tidy/config.toml` |
+| macOS | `~/Library/Application Support/tidy/config.toml` |
+
+### Edit the config file
+
+```toml
+[categories]
+Images = ["png", "jpg", "jpeg", "gif", "bmp", "svg", "webp"]
+Docs = ["pdf", "doc", "docx", "txt", "rtf", "otd"]
+Videos = ["mp4", "mkv", "avi", "mov", "wmv", "flv"]
+Audio = ["mp3", "wav", "flac", "aac", "ogg", "m4a"]
+Archives = ["zip", "rar", "7z", "tar", "gz", "bz2"]
+
+# Add your own categories
+Code = ["rs", "py", "js", "ts", "go", "c", "cpp"]
+Design = ["psd", "ai", "fig", "sketch", "xd"]
+```
+
+Custom categories are **merged** with the defaults. You only need to define what you want to add or override.
 
 ## Development
 
@@ -186,9 +224,8 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Roadmap
 
-- [ ] Custom category configuration via config file
+- [x] Custom category configuration via config file
 - [ ] Recursive directory organization
-- [ ] Undo/restore functionality
 - [ ] Date-based organization option
 - [ ] File size-based organization
 

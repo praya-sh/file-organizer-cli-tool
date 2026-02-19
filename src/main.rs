@@ -1,6 +1,8 @@
+mod config;
 mod log;
 mod utils;
 
+use config::Config;
 use log::{OperationLog, log_file_name};
 use std::env;
 use std::fs;
@@ -12,6 +14,15 @@ fn main() {
     let dry_run = args.iter().any(|arg| arg == "--dry-run");
     let force = args.iter().any(|arg| arg == "--force");
     let revert = args.iter().any(|arg| arg == "--revert");
+    let init_config = args.iter().any(|arg| arg == "--init-config");
+
+    if init_config {
+        match Config::save_default() {
+            Ok(path) => println!("Config file created at: {:?}", path),
+            Err(e) => eprintln!("Error: {}", e),
+        }
+        return;
+    }
 
     let dir = args
         .iter()
@@ -19,6 +30,8 @@ fn main() {
         .find(|arg| !arg.starts_with("--"))
         .map(String::as_str)
         .unwrap_or(".");
+
+    let config = Config::load();
 
     if revert {
         // Revert mode: reverse the operations from the log
@@ -109,8 +122,8 @@ fn main() {
                     .to_string_lossy()
                     .to_lowercase();
 
-                let category = category_for_extension(&ext);
-                let target_dir = Path::new(dir).join(category);
+                let category = category_for_extension(&ext, &config);
+                let target_dir = Path::new(dir).join(&category);
 
                 let file_name = path.file_name().unwrap();
                 let mut new_path = target_dir.join(file_name);
